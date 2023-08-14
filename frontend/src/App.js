@@ -1,49 +1,34 @@
-import "./App.css";
-import { useEffect } from "react";
-import ABI from "./abi.json";
-import { ethers } from "ethers";
-import axios from "axios";
+import { useState } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Wallet from "./components/Wallet";
+import Task from "./components/Task";
+import { NotFound } from "./components/NotFound";
 
 function App() {
-  const contractAddress = ABI.address;
-  useEffect(() => {
-    const getContract = async () => {
-      try {
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        const signer = await provider.getSigner();
-        const contracts = new ethers.Contract(contractAddress, ABI.abi, signer);
-        console.log(contracts);
+  const [contract, setContract] = useState(null);
 
-        // const data = await contracts.deleteTask(2);
-
-        const data = await axios.get("http://localhost:1234/todo/viewTask");
-        console.log(data);
-        // const data = await axios.post("http://localhost:1234/todo/create", {
-        //   date: "23/3/2322",
-        // });
-        // console.log(data);
-        // if (data.data.message === "Yes") {
-        //   await contracts.create("lucky", "23/3/2322");
-        // } else {
-        //   console.log("This date is booked");
-        // }
-
-        // const data = await axios.put("http://localhost:1234/todo/update", {
-        //   date: "23/4/2322",
-        // });
-        // if (data.data.message === "Yes") {
-        //   await contracts.update(2, "Lucky", "23/4/2322");
-        // } else {
-        //   console.log("date is booked");
-        // }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getContract();
-  }, []);
-
-  return <div className="App">hello</div>;
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route
+          exact
+          path="/todo"
+          element={<Task contract={contract} setContract={setContract} />}
+        />
+        <Route
+          exact
+          path="/"
+          element={<Wallet setContract={setContract} contract={contract} />}
+        />
+        <Route
+          exact
+          path="/*"
+          element={<NotFound contract={contract} setContract={setContract} />}
+        />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
 export default App;
